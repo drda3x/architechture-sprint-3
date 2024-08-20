@@ -1,0 +1,101 @@
+@startuml
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include DEVICONS/java.puml
+!include FONTAWESOME/users.puml
+
+System_Boundary(device_manager, "Управление устройствами") {
+	class DeviceManagerApi {
+		+void receive_message()
+		+void send_message()
+	}
+
+	class DeviceManager {
+		-Device[] devices
+		+void process_message(String message)
+		-bool add_device(Device new_device)
+		-bool remove_device(int device_id)
+	}
+
+	abstract class Device {
+		+void update_state(String new_state)
+		+String get_status()
+	}
+
+	class LightDevice {
+		-bool status
+		+void update_state(String new_state)
+		+String get_status()
+		-void turn_on()
+		-void turn_off()
+	}
+
+	class HitDevice {
+		-float target_temp
+		-float current_temp
+		+String get_status()
+		+void update_state(String new_state)
+		+float get_current_temp()
+		-void set_temperature()
+	}
+
+	class GateDevice {
+		-bool status
+		+void update_state(String new_state)
+		+String get_status()
+		-void open()
+		-void close()
+	}
+	LightDevice *-- DeviceManager
+	HitDevice *-- DeviceManager
+	GateDevice *-- DeviceManager
+
+	Device <|-- LightDevice
+	Device <|-- HitDevice
+	Device <|-- GateDevice
+
+	DeviceManager -- DeviceManagerApi
+}
+
+System_Boundary(user_manager, "Работа с\nпользователями") {
+	class UserManagerApi {
+		+void receive_message()
+		+void send_message()
+	}
+
+	class DeviceModel {
+		+uuid id
+		+uuid user_id
+		+String device_type
+		+String get()
+		+void save()
+		+void remove()
+	}
+
+	class UserModel {
+		+uuid id
+		+String name 
+		+String address
+		+String get()
+		+void save()
+		+void remove()
+	}
+
+	class TelemetryModel {
+		+uuid device_id
+		+String telemetry_data
+		+String get()
+		+void update()
+		+void remove()
+	}
+
+	UserManagerApi -- DeviceModel
+	UserManagerApi -- UserModel
+	UserManagerApi -- TelemetryModel
+}
+
+
+@enduml

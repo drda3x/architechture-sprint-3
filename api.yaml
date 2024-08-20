@@ -1,22 +1,135 @@
 openapi: 3.0.0
 info:
-  title: simple-api
-  version: 0.1.0
-
+  title: Smart Home API
+  version: 1.0.0
 paths:
-  /hello:
+  /device/list/:
     get:
+      summary: Получить список устройств пользователя  
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: number
+          required: true
       responses:
         '200':
-          description: A simple hello world!
+          description: User device list
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-              example: Hello from a mocked response!
-      x-kusk:
-        upstream:
-          service:
-            name: hello-world-svc
-            namespace: default
-            port: 8080
+                type: array
+                items:
+                  type: integer
+                example: [1, 2, 3]
+                
+  /device/type/list:
+    get:
+      summary: Получить список поддерживаемых типов устройств
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string 
+                    description:
+                      type: string
+            
+  /device/telemetry:
+    get:
+      summary: Обновить данные по телеметрии
+      parameters:
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200': 
+          description: Device telemetry data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  param1:
+                    type: integer
+                      
+  /device/add:
+    post:
+      summary: Добавить новое устройство
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer 
+                name:
+                  type: string
+                groups:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        '200':
+          description: "Device successfuly added"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  device_id:
+                    type: integer
+                    
+  /device/edit:
+    post:
+      summary: Изменить устройство
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id: 
+                  type: integer  
+                device_id: 
+                  type: integer
+                description: 
+                  type: string
+      responses:
+        '200':
+          description: Device successfuly edited
+          
+  /device/command:
+    post:
+      summary: Отправить команду на изменение состояния устройства
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                device_id: 
+                  type: integer
+                command:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    param1:
+                      type: string
+                    param2:
+                      type: string
+      responses:
+        '200':
+          description: "OK"

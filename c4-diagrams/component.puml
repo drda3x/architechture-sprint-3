@@ -1,0 +1,40 @@
+@startuml
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include DEVICONS/java.puml
+!include FONTAWESOME/users.puml
+
+title Component diagram
+top to bottom direction
+
+Person(sensor, "Sensor", $sprite=robot)
+ContainerDb(postgre, "PostgreSQL", "Информация об\nустройствах")
+ContainerDb(redis, "Redis", "Целевые и текущие\nзначения")
+
+
+System_Boundary(device_manager_system, "Управление\nустройствами") {
+	Container(device_manager_api, "ApiProvider")
+	Container(device_manager, "Manager")
+	Container(device, "Device")
+
+	BiRel_D(device_manager_api, device_manager, '')
+	BiRel_R(device_manager, device, '')
+	Rel_D(device, sensor, '')
+	Rel_D(device_manager, redis, '')
+}
+
+
+System_Boundary(user_manager, "Работа с\nпользователями") {
+	Container(user_manager_api, "ApiProvider")
+	Container(user_manager_db_model, "DbModel")
+
+	BiRel_D(user_manager_api, user_manager_db_model, '')
+	Rel_D(user_manager_db_model, postgre, '')
+}
+
+
+
+@enduml

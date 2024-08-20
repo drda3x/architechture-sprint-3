@@ -1,0 +1,17 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include DEVICONS/java.puml
+!include FONTAWESOME/users.puml
+
+title C4 context diagram
+
+Person(user, "Users", $sprite="users")
+Person(sensor, "Sensor", $sprite=robot)
+System(smh, "SmartHome", "java", $sprite=java)
+
+Rel(user, smh, "Установка температуры; Включение/отключение устройств")
+Rel(smh, sensor, "Запрос на получение текущей температуры; Запрос на установку целевой температуры; Запрос на включение устройства; Запрос на отключение устройства")
+@enduml
