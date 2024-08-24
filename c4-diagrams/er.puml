@@ -1,45 +1,53 @@
 @startuml
 
 class User {
-	uuid
+	id
 	name
 	address
-	device_groups
 }
 
 class Device {
-	uuid
+	id
 	name
+	user_id
 	DeviceType
 }
 
 class DeviceType {
-	uuid
+	id
 	name
 }
 
-class Telemetry {
-	uuid
+class TelemetryData {
+	id
 	device_id
 	timestamp
 	data
 }
 
 class DeviceGroup {
-	uuid
-	Device[]
+	id	
+	group_name
+	Device[] device_list
+	User[] users_list
 }
 
 class Scenario {
-	uuid
-	DeviceGroup[]
-	actions[]
+	id
+	device_id
+	DeviceState[] 
 }
 
-User "*" *-- "1" DeviceGroup
+class DeviceState {
+	id
+	data
+}
+
 DeviceGroup "*" *-- "1" Device
 DeviceType "1" --> "1" Device
-Telemetry "1" --> "1" Device
-Scenario "*" *-- "1" DeviceGroup
+TelemetryData "1" --> "1" Device
+
+DeviceState "*" *-- "1" Scenario
+DeviceGroup "*" --* "*" User
 
 @enduml

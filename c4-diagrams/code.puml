@@ -8,9 +8,14 @@
 !include FONTAWESOME/users.puml
 
 System_Boundary(device_manager, "Управление устройствами") {
-	class DeviceManagerApi {
-		+void receive_message()
-		+void send_message()
+
+	class MessageConsumer {
+		+Command receive_message();
+	}
+
+	class Command {
+		integer device_id
+		+void execute()
 	}
 
 	class DeviceManager {
@@ -21,14 +26,13 @@ System_Boundary(device_manager, "Управление устройствами")
 	}
 
 	abstract class Device {
+		-integer device_id
 		+void update_state(String new_state)
-		+String get_status()
 	}
 
 	class LightDevice {
 		-bool status
 		+void update_state(String new_state)
-		+String get_status()
 		-void turn_on()
 		-void turn_off()
 	}
@@ -36,65 +40,79 @@ System_Boundary(device_manager, "Управление устройствами")
 	class HitDevice {
 		-float target_temp
 		-float current_temp
-		+String get_status()
 		+void update_state(String new_state)
-		+float get_current_temp()
 		-void set_temperature()
 	}
 
 	class GateDevice {
 		-bool status
 		+void update_state(String new_state)
-		+String get_status()
 		-void open()
 		-void close()
 	}
-	LightDevice *-- DeviceManager
-	HitDevice *-- DeviceManager
-	GateDevice *-- DeviceManager
+	Device *-- DeviceManager
 
 	Device <|-- LightDevice
 	Device <|-- HitDevice
 	Device <|-- GateDevice
 
-	DeviceManager -- DeviceManagerApi
+	MessageConsumer --> Command : creates
+	DeviceManager -- Command : uses
 }
 
-System_Boundary(user_manager, "Работа с\nпользователями") {
-	class UserManagerApi {
-		+void receive_message()
-		+void send_message()
+System_Boundary(telemetry_manager, "Телеметрия") {
+
+	class TelemetryData {
+		+integer device_id
+		+string data
 	}
 
-	class DeviceModel {
-		+uuid id
-		+uuid user_id
-		+String device_type
-		+String get()
+	class PostgreSQLModel {
 		+void save()
-		+void remove()
 	}
 
-	class UserModel {
-		+uuid id
-		+String name 
-		+String address
-		+String get()
-		+void save()
-		+void remove()
+	abstract class Device {
+		-integer device_id
+		+void update_state(String new_state)
 	}
 
-	class TelemetryModel {
-		+uuid device_id
-		+String telemetry_data
-		+String get()
-		+void update()
-		+void remove()
+	class LightDevice {
+		-bool status
+		+void update_state(String new_state)
+		-void turn_on()
+		-void turn_off()
 	}
 
-	UserManagerApi -- DeviceModel
-	UserManagerApi -- UserModel
-	UserManagerApi -- TelemetryModel
+	class HitDevice {
+		-float target_temp
+		-float current_temp
+		+void update_state(String new_state)
+		-void set_temperature()
+	}
+
+	class GateDevice {
+		-bool status
+		+void update_state(String new_state)
+		-void open()
+		-void close()
+	}
+
+	Device <|-- LightDevice
+	Device <|-- HitDevice
+	Device <|-- GateDevice
+
+	class TelemetryManager {
+		-Device[] devices
+
+		+TelemetryData send_request()
+		+void update_db(TelemetryData)
+	}
+
+	Device *-- TelemetryManager
+
+	TelemetryData <-- PostgreSQLModel : uses
+	TelemetryManager --> TelemetryData : uses
+	TelemetryManager --> PostgreSQLModel : calls
 }
 
 
