@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  device-manager:
+    build: ./device-manager-service
+    depends_on:
+      - kafka
+    container_name: device-manager
+    environment:
+      - KAFKA_SERVER=kafka:9092
+    restart: unless-stopped
+    networks:
+      - smart-home-network
+
+  telemetry-manager:
+    build: ./telemetry-manager-service
+    depends_on:
+      - kafka
+    container_name: telemetry-manager
+    environment:
+      - KAFKA_SERVER=kafka:9092
+    restart: unless-stopped
+    networks:
+      - smart-home-network
+
+  api-gw:
+    build: ./api-gw
+    depends_on:
+      - kafka
+    container_name: api-gw
+    ports:
+      - "5000:5000"
+    environment:
+      - KAFKA_SERVER=kafka:9092
+    restart: unless-stopped
+    networks:
+      - smart-home-network
+
+  kafka:
+    image: "apache/kafka"
+    container_name: kafka
+    restart: unless-stopped
+    networks:
+      - smart-home-network
+
+networks:
+  smart-home-network:

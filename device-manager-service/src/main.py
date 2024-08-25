@@ -25,14 +25,15 @@ def process_message(db, topic, message_data):
             device.set_state(message_data)
 
 
-def main(kafka_server, redis_server):
-    consumer = KafkaConsumer(*TOPICS)
+def main(kafka_server):
+    consumer = KafkaConsumer(*TOPICS, bootstrap_servers=kafka_server)
     db = DeviceDatabase()
-    rate = 1
+    rate = 0.1
 
     while True:
         try:
-            for topic, messages in consumer.poll().items():
+            polled = consumer.poll()
+            for topic, messages in polled.items():
                 messages = list(messages)
                 messages.sort(key=lambda x: (x.timestamp, x.offset))
                 for message in messages:
@@ -45,11 +46,10 @@ def main(kafka_server, redis_server):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--kafka", help="Kafka server setting")
-    parser.add_argument("--redis", help="Redis server setting")
 
     args = parser.parse_args()
 
-    if args.kafka and args.redis:
-        main(args.kafka, args.redis)
+    if args.kafka:
+        main(args.kafka)
     else:
         pass

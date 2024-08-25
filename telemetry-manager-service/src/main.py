@@ -15,11 +15,10 @@ def process_message(db, topic, message_data):
 
 
 def main(kafka_server):
-    produser = KafkaProducer()
-    consumer = KafkaConsumer(DEVICE_ADD_TOPIC)
-
     db = DeviceDatabase()
-    rate = 1
+    produser = KafkaProducer(bootstrap_servers=kafka_server)
+    consumer = KafkaConsumer(DEVICE_ADD_TOPIC, bootstrap_servers=kafka_server)
+    rate = 0.1
 
     while True:
         try:
@@ -33,6 +32,7 @@ def main(kafka_server):
                 produser.send(TELEMETRY_TOPIC, json.dumps(device.get_data()).encode("utf-8"))
 
             time.sleep(rate)
+
         except KeyboardInterrupt:
             break
 
