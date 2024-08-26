@@ -3,7 +3,7 @@ import argparse
 import requests
 
 
-URL = "http://localhost:5000{}"
+URL = "http://10.103.203.196:5000{}"
 
 
 def add_device(args):
@@ -62,6 +62,7 @@ def get_state(args):
     }
 
     response = requests.get(URL.format("/device/state"), json=data)
+    print(response.text)
     return response.status_code
 
 

@@ -22,7 +22,8 @@ def main(kafka_server):
 
     while True:
         try:
-            for topic, messages in consumer.poll().items():
+            polled = consumer.poll()
+            for topic, messages in polled.items():
                 messages = list(messages)
                 messages.sort(key=lambda x: (x.timestamp, x.offset))
                 for message in messages:

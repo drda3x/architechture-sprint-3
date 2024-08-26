@@ -34,79 +34,25 @@ PostgreSQL
     - Поддомен. Управление устройствами
         - Контекст. Добавление/Удаление устройств
         - Контекст. Отправка команд устройствам
+- Домен. Дома и группы
+    - Контекст. Добавление / удаление пользователей
+    - Контекст. Добавление / удаление групп устройств
+    - Контекст. Добавление / удаление сценариев
 
 
-# Базовая настройка
+# C4. Диаграммы
+    - с4-diagrams/code.puml - диаграмма классов
+    - с4-diagrams/component.puml - диаграмма компонентов
+    - с4-diagrams/container.puml - диаграмма контейнеров
+    - с4-diagrams/context.puml - диаграмма контекста
+    - с4-diagrams/er.puml - ER диаграмма
 
-## Запуск minikube
+# Документация API
+    - device-manager-service/device-manager-api.yaml
+    - telemetry-manager-service/telemetry-manager-api.yaml
+    - api-gw/api-gw.yaml
 
-[Инструкция по установке](https://minikube.sigs.k8s.io/docs/start/)
-
-```bash
-minikube start
-```
-
-
-## Добавление токена авторизации GitHub
-
-[Получение токена](https://github.com/settings/tokens/new)
-
-```bash
-kubectl create secret docker-registry ghcr --docker-server=https://ghcr.io --docker-username=<github_username> --docker-password=<github_token> -n default
-```
-
-
-## Установка API GW kusk
-
-[Install Kusk CLI](https://docs.kusk.io/getting-started/install-kusk-cli)
-
-```bash
-kusk cluster install
-```
-
-
-## Настройка terraform
-
-[Установите Terraform](https://yandex.cloud/ru/docs/tutorials/infrastructure-management/terraform-quickstart#install-terraform)
-
-
-Создайте файл ~/.terraformrc
-
-```hcl
-provider_installation {
-  network_mirror {
-    url = "https://terraform-mirror.yandexcloud.net/"
-    include = ["registry.terraform.io/*/*"]
-  }
-  direct {
-    exclude = ["registry.terraform.io/*/*"]
-  }
-}
-```
-
-## Применяем terraform конфигурацию 
-
-```bash
-cd terraform
-terraform apply
-```
-
-## Настройка API GW
-
-```bash
-kusk deploy -i api.yaml
-```
-
-## Проверяем работоспособность
-
-```bash
-kubectl port-forward svc/kusk-gateway-envoy-fleet -n kusk-system 8080:80
-curl localhost:8080/hello
-```
-
-
-## Delete minikube
-
-```bash
-minikube delete
-```
+# Интеграция с монолитным решением
+Для упрощения работы и уменьшения времени, которое нужно потратить на монолитное решение, был выбран вариант 
+создания шлюза на уровне api-gw, который будет либо пересылать запрсы к старому монолиту либо отправлять их
+через кафку новым микросервисам.
