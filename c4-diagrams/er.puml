@@ -43,11 +43,11 @@ class DeviceState {
 	data
 }
 
-DeviceGroup "*" *-- "1" Device
-DeviceType "1" --> "1" Device
-TelemetryData "1" --> "1" Device
+DeviceGroup "*" o-- "1" Device
+DeviceType "*" -- "*" Device
+TelemetryData "*" -- "*" Device
 
-DeviceState "*" *-- "1" Scenario
-DeviceGroup "*" --* "*" User
+DeviceState "*" --o "1" Scenario
+DeviceGroup "*" --o "*" User
 
 @enduml

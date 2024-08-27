@@ -8,10 +8,38 @@
 
 title C4 context diagram
 
-Person(user, "Users", $sprite="users")
-Person(sensor, "Sensor", $sprite=robot)
-System(smh, "SmartHome", "java", $sprite=java)
+System_Boundary(old, "Старый монолит") {
+	Person(user, "Users", $sprite="users")
+	Person(sensor, "Устройство/Датчик", $sprite=robot)
+	System(smh, "SmartHome", "java", $sprite=java)
 
-Rel(user, smh, "Установка температуры; Включение/отключение устройств")
-Rel(smh, sensor, "Запрос на получение текущей температуры; Запрос на установку целевой температуры; Запрос на включение устройства; Запрос на отключение устройства")
+	Rel(user, smh, "Установка температуры; Включение/отключение устройств")
+	Rel(smh, sensor, "Запрос на получение текущей температуры; Запрос на установку целевой температуры; Запрос на включение устройства; Запрос на отключение устройства")
+}
+
+System_Boundary(new, "Новая экосистема") {
+	Person(user2, "Users", $sprite="users")
+	Person(sensor2, "Датчик", $sprite=robot)
+	Person(actuator2, "Устройство\nуправления", $sprite=robot)
+
+	System(device_management, "Управление устройствами")
+	System(telemetry_management, "Телеметрия")
+	System(user_management, "Пользователи")
+	System(autonomous_scenario_management, "Сценарии и автоматизация")
+	System(group_management, "Группы устройств\n(Дома, поселки, команты и тд.)")
+
+	Rel(user2, user_management, "Добавление, удаление, редактирование данных")
+	Rel(user2, device_management, "Добавление, удаление, редактирование устройств\nКоманды на установку целевого состояния")
+	Rel(user2, group_management, "Добавление, удаление, редактирование групп.\nДобавление, удаление устройств в группу")
+	Rel(user2, autonomous_scenario_management, "Добавление, удаление, редактирование сценариев\nКоманды на запуск сценариев")
+	Rel(user2, telemetry_management, "Получение данных о текущем состоянии устройства")
+
+	Rel(device_management, actuator2, "Установка целевого состояния устройства")
+	Rel(telemetry_management, sensor2, "Получение данных от датчика")
+
+	Rel(telemetry_management, autonomous_scenario_management, "Получение обратной связи от датчиков")
+	Rel(autonomous_scenario_management, device_management, "Установка целевого состояния устройства")
+}
+
 @enduml
+
