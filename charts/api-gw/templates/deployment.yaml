@@ -42,7 +42,9 @@ spec:
               protocol: TCP
           env:
             - name: KAFKA_SERVER
-              value: kafka-broker:9092
+              value: {{ .Values.env.kafka_server }}
+            - name: JAVA_MONOLITH_ADDR 
+              value: {{ .Values.env.java_monolith }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:

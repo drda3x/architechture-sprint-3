@@ -16,6 +16,10 @@ imagePullSecrets:
 nameOverride: ""
 fullnameOverride: ""
 
+env:
+  kafka_server: kafka-broker:9092
+  java_monolith: javamonolith
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
