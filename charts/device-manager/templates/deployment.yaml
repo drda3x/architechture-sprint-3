@@ -42,7 +42,7 @@ spec:
               protocol: TCP
           env:
             - name: KAFKA_SERVER
-              value: kafka-broker:9092
+              value: {{ .Values.env.kafka_server }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:

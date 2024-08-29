@@ -29,6 +29,9 @@ serviceAccount:
 podAnnotations: {}
 podLabels: {}
 
+env:
+  kafka_server: kafka-broker:9092
+
 podSecurityContext: {}
   # fsGroup: 2000
 
