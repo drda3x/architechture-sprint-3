@@ -67,7 +67,15 @@ def index():
 @app.route("/device/add", methods=("POST",))
 def add_device():
     data = request.get_json()
-    kafka_producer.send(DEVICE_ADD_TOPIC, json.dumps(data).encode('utf-8'))
+
+    # java monolith behaviour
+    if data["device_type"] == "hit_device":
+        response = requests.put("http://" + java_monolith_addr + '/' + data["device_type"])
+        return json_response(**response.json())
+
+    else:
+        kafka_producer.send(DEVICE_ADD_TOPIC, json.dumps(data).encode('utf-8'))
+
     return 'OK', 200
 
 
@@ -90,14 +98,13 @@ def get_device_state():
     data = request.get_json()
 
     # java monolith behaviour
-    logger.info(data)
     if data["device_type"] == "hit_device":
-        data = requests.get(java_monolith_addr + '/' + device["id"])
-        return json_response(**data)
+        response = requests.get("http://" + java_monolith_addr + '/' + data["device_id"] + "/current-temperature")
+        return json_response(**response.json())
 
     else:
         response = STATE_CACHE.get(data["device_id"])
-        return json_response(**response)
+        return json_response(**data)
 
 
 read_proc = Thread(target=read_kafka_messages)

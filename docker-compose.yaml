@@ -35,15 +35,15 @@ services:
       - "5000:5000"
     environment:
       - KAFKA_SERVER=kafka:9092
-      - JAVA_MONOLITH_ADDR=java-monolith:80
+      - JAVA_MONOLITH_ADDR=javamonolith
     restart: unless-stopped
     networks:
       - smart-home-network
 
-  java-monolith:
+  javamonolith:
     image: ghcr.io/drda3x/java-monolith
     build: ./smart-home-monolith
-    container_name: java-monolith 
+    container_name: javamonolith 
     restart: unless-stopped
     networks:
       - smart-home-network
@@ -67,6 +67,16 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_NUM_PARTITIONS: 3
+
+  postgres:
+    image: "postgres:13-alpine"
+    container_name: postgres
+    environment:
+      POSTGRES_PASSWORD: your_password
+      POSTGRES_USER: your_username
+      POSTGRES_DB: smart_home
+    networks:
+      - smart-home-network
 
 networks:
   smart-home-network:
