@@ -1,0 +1,53 @@
+@startuml
+
+class User {
+	id
+	name
+	address
+}
+
+class Device {
+	id
+	name
+	user_id
+	DeviceType
+}
+
+class DeviceType {
+	id
+	name
+}
+
+class TelemetryData {
+	id
+	device_id
+	timestamp
+	data
+}
+
+class DeviceGroup {
+	id	
+	group_name
+	Device[] device_list
+	User[] users_list
+}
+
+class Scenario {
+	id
+	device_id
+	DeviceState[] 
+}
+
+class DeviceState {
+	id
+	data
+}
+
+DeviceGroup "*" o-- "1" Device
+DeviceType "*" -- "*" Device
+TelemetryData "*" -- "*" Device
+
+DeviceState "*" --o "1" Scenario
+DeviceGroup "*" --o "*" User
+
+@enduml

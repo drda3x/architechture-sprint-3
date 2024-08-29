@@ -1,0 +1,44 @@
+@startuml
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include DEVICONS/java.puml
+!include FONTAWESOME/users.puml
+
+title Component diagram
+top to bottom direction
+
+Person(sensor, "Sensor", $sprite=robot)
+
+Container(kafka, "Kafka", "")
+
+System_Boundary(device_manager_system, "Управление\nустройствами") {
+	Container(dm_kafka_consumer, "Consumer")
+	Container(dm_main, "Main")
+	ContainerDb(redis, "Redis", "Целевые и текущие\nзначения")
+
+	Rel_R(dm_kafka_consumer, dm_main, "json")
+	Rel_R(dm_main, redis, "json")
+	Rel_D(dm_main, sensor, "")
+}
+
+Rel_U(kafka, dm_kafka_consumer, "json")
+
+
+System_Boundary(telemetry_manager_system, "Телеметрия") {
+	Container(tm_kafka_producer, "Producer")
+	Container(tm_main, "Main")
+	ContainerDb(postgre, "PostgreSQL", "Информация об\nустройствах")
+
+	Rel_R(tm_main, postgre, "")
+	Rel(sensor, tm_main, "")
+	Rel(tm_main, tm_kafka_producer, "")
+}
+
+Rel_L(tm_kafka_producer, kafka, "json")
+
+
+
+@enduml

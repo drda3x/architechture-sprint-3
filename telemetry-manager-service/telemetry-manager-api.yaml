@@ -1,0 +1,64 @@
+asyncapi: 3.0.0
+info:
+  title: "Сервис. Телеметрия"
+  version: 0.0.0
+  description: Сервис для сбора телеметрии с устройств и публикации их состояний
+channels:
+  deviceState:
+    address: device-telemetry
+    messages:
+      LightState:
+        $ref: '#/components/messages/LightState'
+      GateState:
+        $ref: '#/components/messages/GateState'
+      TemperatureState:
+        $ref: '#/components/messages/TemperatureState'
+      VideoState:
+        $ref: '#/components/messages/VideoState'
+
+operations:
+  deviceStateSet:
+    action: send
+    channel:
+      $ref: '#/channels/deviceState'
+    messages:
+      - $ref: '#/channels/deviceState/messages/LightState'
+
+components:
+  messages:
+    LightState:
+      payload:
+        type: object
+        properties:
+          device_id:
+            type: integer
+          status:
+            type: string
+
+    GateState:
+      payload:
+        type: object 
+        properties:
+          device_id:
+            type: integer
+          status:
+            type: string
+
+    TemperatureState:
+      payload:
+        type: object
+        properties:
+          device_id:
+            type: integer
+          temperature_val:
+            type: number
+          
+    VideoState:
+      payload:
+        type: object
+        properties:
+          device_id:
+            type: integer
+          status:
+            type: string
+

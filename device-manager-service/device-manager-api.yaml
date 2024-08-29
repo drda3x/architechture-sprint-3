@@ -1,0 +1,77 @@
+asyncapi: 3.0.0
+info:
+  title: "Сервис. Управление устройствами"
+  version: 0.0.0
+  description: Сервис для получения данных о целевых значениях и отправки команд устройствам
+channels:
+  manageDevice:
+    address: device-add
+    messages:
+      AddDevice:
+        $ref: '#/components/messages/AddDevice'
+  deviceState:
+    address: device-state-set
+    messages:
+      LightState:
+        $ref: '#/components/messages/LightState'
+      GateState:
+        $ref: '#/components/messages/GateState'
+      TemperatureState:
+        $ref: '#/components/messages/TemperatureState'
+      VideoState:
+        $ref: '#/components/messages/VideoState'
+
+operations:
+  deviceStateSet:
+    action: receive
+    channel:
+      $ref: '#/channels/deviceState'
+    messages:
+      - $ref: '#/channels/deviceState/messages/LightState'
+
+components:
+  messages:
+    LightState:
+      payload:
+        type: object
+        properties:
+          device_id:
+            type: integer
+          status:
+            type: boolean
+    GateState:
+      payload:
+        type: object 
+        properties:
+          device_id:
+            type: integer
+          status:
+            type: boolean
+
+    TemperatureState:
+      payload:
+        type: object
+        properties:
+          device_id:
+            type: integer
+          temperature_val:
+            type: number
+          
+    VideoState:
+      payload:
+        type: object
+        properties:
+          device_id:
+            type: integer
+          status:
+            type: boolean
+
+    AddDevice:
+      payload:
+        type: object
+        properties:
+          device_id:
+            type: integer
+          device_type:
+            type: string
+

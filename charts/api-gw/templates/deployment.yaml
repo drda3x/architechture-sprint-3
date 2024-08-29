@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "smart-home-monolith.fullname" . }}
+  name: {{ include "api-gw.fullname" . }}
   labels:
-    {{- include "smart-home-monolith.labels" . | nindent 4 }}
+    {{- include "api-gw.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "smart-home-monolith.selectorLabels" . | nindent 6 }}
+      {{- include "api-gw.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,7 +18,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "smart-home-monolith.labels" . | nindent 8 }}
+        {{- include "api-gw.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -27,7 +27,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "smart-home-monolith.serviceAccountName" . }}
+      serviceAccountName: {{ include "api-gw.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -41,10 +41,14 @@ spec:
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           env:
-            - name: DATABASE_URL
-              value: {{ .Values.env.database.url }}
-            - name: DATABASE_PORT
-              value: "{{ .Values.env.database.port }}"
+            - name: KAFKA_SERVER
+              value: {{ .Values.env.kafka_server }}
+            - name: JAVA_MONOLITH_ADDR 
+              value: {{ .Values.env.java_monolith }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with .Values.volumeMounts }}

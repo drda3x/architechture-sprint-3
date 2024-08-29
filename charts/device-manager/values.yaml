@@ -1,18 +1,17 @@
-# Default values for smart-home-monolith.
+# Default values for device-manager.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
 
 image:
-  repository: ghcr.io/drda3x/java-monolith
+  repository: ghcr.io/drda3x/device-manager-service
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
 
 imagePullSecrets: 
-  - name: ghcr
-
+  - name: dockerconfigjson-github-com
 nameOverride: ""
 fullnameOverride: ""
 
@@ -30,6 +29,9 @@ serviceAccount:
 podAnnotations: {}
 podLabels: {}
 
+env:
+  kafka_server: kafka-broker:9092
+
 podSecurityContext: {}
   # fsGroup: 2000
 
@@ -43,7 +45,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 8080
+  port: 80
 
 ingress:
   enabled: false
@@ -73,6 +75,14 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+#livenessProbe:
+#  httpGet:
+#    path: /
+#    port: http
+#readinessProbe:
+#  httpGet:
+#    path: /
+#    port: http
 
 autoscaling:
   enabled: false
@@ -99,17 +109,3 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
-
-postgresql:
-  enabled: true
-  auth:
-    username: your_username
-    password: your_password
-    database: smart_home
-
-env:
-  database:
-    url: smart-home-monilith-postgresql
-    port: 5432
-

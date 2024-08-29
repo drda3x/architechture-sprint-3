@@ -1,0 +1,72 @@
+openapi: 3.0.0
+info:
+  title: Smart Home API
+  version: 1.0.0
+paths:
+  /device/add/:
+    get:
+      summary: Добавить устройство
+      parameters:
+        - in: query
+          name: device_id
+          schema:
+            type: number
+          required: true
+        - in: query
+          name: device_type
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: User device list
+                
+  /device/state:
+    get:
+      summary: Получить состояние устройства
+      parameters:
+        - in: query
+          name: device_id
+          schema:
+            type: number
+          required: true
+            
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  device_id:
+                    type: number
+                  status:
+                    type: string
+    
+    post:
+      description: Установить новое значение состояния устройства
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                device_type:
+                  type: string
+                status:
+                  type: boolean
+                temperature:
+                  type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: boolean

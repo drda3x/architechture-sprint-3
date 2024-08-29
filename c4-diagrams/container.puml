@@ -1,0 +1,56 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include DEVICONS/java.puml
+!include FONTAWESOME/users.puml
+
+title Container diagram
+top to bottom direction
+
+
+Person(user, "User")
+Person(sensor, "Датчик", $sprite=robot)
+Person(actuator, "Управляемое\nустройство", $sprite=robot)
+
+
+Container(api_gw, "API Gateway", "Балансировка. Авторизация, аутентификация")
+Container(kafka, "Kafka")
+
+Container(temperature, "Температура\n(Java монолит)", "Управление температурой")
+Container(device_manager, "Управление устройствами", "Отправка устройствам команд")
+Container(telemetry_manager, "Телеметрия", "Сборка и хранение телеметрии с устройств")
+Container(user_manager, "Управление пользователями", "Данные о пользователях")
+Container(notification_manager, "Управление оповещениями")
+Container(scenario_manager, "Менеджер сценариев", "Отслеживание и управление сценариями")
+
+ContainerDb(temperature_db, "PostgreSQL", "Данные по нагревателям\nи датчикам температуры")
+ContainerDb(redis, "Redis", "Данные о текущем целевом состоянии")	
+ContainerDb(telemetry_manager_db, "PostgreSQL", "Исторические данные о телеметрии")
+ContainerDb(user_manager_db, "PostgreSQL", "Информация о пользова-\nтелях, домах, группах")
+ContainerDb(notification_db, "Redis", "Очередь оповещений")
+ContainerDb(scenario_db, "PostgreSQL", "Хранение пользовательских сценариев")
+
+Rel_D(temperature, temperature_db, "sql")
+Rel_D(device_manager, redis, "json")
+Rel_D(telemetry_manager, telemetry_manager_db, "sql")
+Rel_D(user_manager, user_manager_db, "sql")
+Rel_D(notification_manager, notification_db, "json")
+Rel_D(scenario_manager, scenario_db, "sql")
+
+BiRel(kafka, device_manager, "json")
+BiRel(kafka, telemetry_manager, "json")
+BiRel(kafka, temperature, "json")
+BiRel(kafka, user_manager, "json")
+BiRel_D(api_gw, kafka, "json")
+BiRel(kafka, notification_manager, "json")
+BiRel(kafka, scenario_manager, "json")
+
+Rel_D(device_manager, actuator, "http")
+Rel_D(telemetry_manager, sensor, "http")
+
+BiRel_D(user, api_gw, "http/https")
+
+
+@enduml

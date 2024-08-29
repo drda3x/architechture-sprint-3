@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  device-manager:
+    image: ghcr.io/drda3x/device-manager-service
+    build: ./device-manager-service
+    depends_on:
+      - kafka
+    container_name: device-manager
+    environment:
+      - KAFKA_SERVER=kafka:9092
+    restart: unless-stopped
+    networks:
+      - smart-home-network
+
+  telemetry-manager:
+    image: ghcr.io/drda3x/telemetry-manager-service
+    build: ./telemetry-manager-service
+    depends_on:
+      - kafka
+    container_name: telemetry-manager
+    environment:
+      - KAFKA_SERVER=kafka:9092
+    restart: unless-stopped
+    networks:
+      - smart-home-network
+
+  api-gw:
+    image: ghcr.io/drda3x/api-gw
+    build: ./api-gw
+    depends_on:
+      - kafka
+    container_name: api-gw
+    ports:
+      - "5000:5000"
+    environment:
+      - KAFKA_SERVER=kafka:9092
+      - JAVA_MONOLITH_ADDR=javamonolith
+    restart: unless-stopped
+    networks:
+      - smart-home-network
+
+  javamonolith:
+    image: ghcr.io/drda3x/java-monolith
+    build: ./smart-home-monolith
+    container_name: javamonolith 
+    restart: unless-stopped
+    networks:
+      - smart-home-network
+    environment:
+      DATABASE_URL: postgres
+      DATABASE_PORT: 5432
+
+  kafka:
+    image: "apache/kafka"
+    container_name: kafka
+    restart: unless-stopped
+    networks:
+      - smart-home-network
+    environment:
+      KAFKA_NODE_ID: 1 
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
+
+  postgres:
+    image: "postgres:13-alpine"
+    container_name: postgres
+    environment:
+      POSTGRES_PASSWORD: your_password
+      POSTGRES_USER: your_username
+      POSTGRES_DB: smart_home
+    networks:
+      - smart-home-network
+
+networks:
+  smart-home-network:

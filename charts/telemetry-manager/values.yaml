@@ -1,18 +1,17 @@
-# Default values for smart-home-monolith.
+# Default values for telemetry-manager.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
 
 image:
-  repository: ghcr.io/drda3x/java-monolith
+  repository: ghcr.io/drda3x/telemetry-manager-service
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
 
 imagePullSecrets: 
-  - name: ghcr
-
+  - name: dockerconfigjson-github-com
 nameOverride: ""
 fullnameOverride: ""
 
@@ -43,7 +42,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 8080
+  port: 80
 
 ingress:
   enabled: false
@@ -60,6 +59,9 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+  #
+env:
+  kafka_server: kafka-broker:9092
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -73,6 +75,14 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+#livenessProbe:
+#  httpGet:
+#    path: /
+#    port: http
+#readinessProbe:
+#  httpGet:
+#    path: /
+#    port: http
 
 autoscaling:
   enabled: false
@@ -99,17 +109,3 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
-
-postgresql:
-  enabled: true
-  auth:
-    username: your_username
-    password: your_password
-    database: smart_home
-
-env:
-  database:
-    url: smart-home-monilith-postgresql
-    port: 5432
-
