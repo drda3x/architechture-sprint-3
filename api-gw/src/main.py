@@ -3,10 +3,12 @@ import os
 import json
 import time
 import requests
+import logging
 from threading import Thread, Event
 from flask import Flask, request
 from flask_json import json_response, FlaskJSON
 from kafka import KafkaProducer, KafkaConsumer
+from kafka.errors import NoBrokersAvailable
 
 
 app = Flask(__name__)
@@ -16,12 +18,29 @@ DEVICE_ADD_TOPIC = 'device-add'
 DEVICE_SET_STATE = 'device-state-set'
 DEVICE_GET_STATE = 'device-telemetry'
 
+logger = logging.getLogger("API-GW")
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+logger.addHandler(handler)
 
-print(os.environ["KAFKA_SERVER"])
 java_monolith_addr = os.environ["JAVA_MONOLITH_ADDR"]
-kafka_producer = KafkaProducer(bootstrap_servers=os.environ["KAFKA_SERVER"])
-kafka_consumer = KafkaConsumer(DEVICE_GET_STATE, bootstrap_servers=os.environ["KAFKA_SERVER"])
 
+broker_found = False
+logger.info("Waiting for kafka")
+while not broker_found:
+    try:
+        kafka_producer = KafkaProducer(bootstrap_servers=os.environ["KAFKA_SERVER"])
+        kafka_consumer = KafkaConsumer(DEVICE_GET_STATE, bootstrap_servers=os.environ["KAFKA_SERVER"])
+        broker_found = True
+
+    except NoBrokersAvailable:
+        pass
+
+    finally:
+        time.sleep(2)
+
+logger.info("Kafka OK")
 
 STATE_CACHE = {}
 TERMINATE = Event()
@@ -71,6 +90,7 @@ def get_device_state():
     data = request.get_json()
 
     # java monolith behaviour
+    logger.info(data)
     if data["device_type"] == "hit_device":
         data = requests.get(java_monolith_addr + '/' + device["id"])
         return json_response(**data)

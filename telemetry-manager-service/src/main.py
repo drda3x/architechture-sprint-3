@@ -1,23 +1,53 @@
 import json
 import argparse
 import time
+import logging
 
 from device_database import DeviceDatabase
 from kafka import KafkaProducer, KafkaConsumer
+from kafka.errors import NoBrokersAvailable
 
 DEVICE_ADD_TOPIC = 'device-add'
 TELEMETRY_TOPIC = 'device-telemetry'
 
+logger = logging.getLogger("TelemetryManager")
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+logger.addHandler(handler)
+
 
 def process_message(db, topic, message_data):
+    logger.info(f"Received {message_data} from {topic}")
     if topic == DEVICE_ADD_TOPIC:
         db.add(message_data)
 
 
+def wait_kafka(kafka_server):
+    broker_found = False
+    consumer, produser = None, None
+    while not broker_found:
+        try:
+            produser = KafkaProducer(bootstrap_servers=kafka_server)
+            consumer = KafkaConsumer(DEVICE_ADD_TOPIC, bootstrap_servers=kafka_server)
+            broker_found = True
+
+        except NoBrokersAvailable:
+            pass
+
+        finally:
+            time.sleep(2)
+
+    return consumer, produser
+
+
 def main(kafka_server):
-    db = DeviceDatabase()
-    produser = KafkaProducer(bootstrap_servers=kafka_server)
-    consumer = KafkaConsumer(DEVICE_ADD_TOPIC, bootstrap_servers=kafka_server)
+    db = DeviceDatabase(logger)
+
+    logger.info("Wait for kafka")
+    consumer, produser = wait_kafka(kafka_server)
+    logger.info("kafka ok")
+
     rate = 0.1
 
     while True:

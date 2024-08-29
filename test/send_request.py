@@ -3,7 +3,7 @@ import argparse
 import requests
 
 
-URL = "http://10.103.203.196:5000{}"
+URL = "http://localhost:5000{}"
 
 
 def add_device(args):
@@ -19,6 +19,7 @@ def add_device(args):
 def set_light_state(args):
     data = {
         "device_id": args.device_id,
+        "device_type": args.device_type,
         "status": args.status
     }
 
@@ -29,6 +30,7 @@ def set_light_state(args):
 def set_gate_state(args):
     data = {
         "device_id": args.device_id,
+        "device_type": args.device_type,
         "status": args.status
     }
 
@@ -39,6 +41,7 @@ def set_gate_state(args):
 def set_temperature_state(args):
     data = {
         "device_id": args.device_id,
+        "device_type": args.device_type,
         "temperature_val": args.temp
     }
 
@@ -49,6 +52,7 @@ def set_temperature_state(args):
 def set_video_state(args):
     data = {
         "device_id": args.device_id,
+        "device_type": args.device_type,
         "status": args.status
     }
 
@@ -58,7 +62,8 @@ def set_video_state(args):
 
 def get_state(args):
     data = {
-        "device_id": args.device_id
+        "device_id": args.device_id,
+        "device_type": args.device_type
     }
 
     response = requests.get(URL.format("/device/state"), json=data)

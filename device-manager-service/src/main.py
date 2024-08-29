@@ -1,9 +1,11 @@
 import time
 import json
 import argparse
+import logging
 
 from kafka import KafkaConsumer
 from device_database import DeviceDatabase
+from kafka.errors import NoBrokersAvailable
 
 
 STATE_SET_TOPIC  = 'device-state-set'
@@ -14,8 +16,15 @@ TOPICS = [
     DEVICE_ADD_TOPIC
 ]
 
+logger = logging.getLogger("DeviceManager")
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+logger.addHandler(handler)
+
 
 def process_message(db, topic, message_data):
+    logger.info(f"Received {message_data} from {topic}")
     if topic == DEVICE_ADD_TOPIC:
         db.add(message_data)
 
@@ -25,9 +34,27 @@ def process_message(db, topic, message_data):
             device.set_state(message_data)
 
 
+def wait_consumer(kafka_server):
+    broker_found = False
+    consumer = None
+    while not broker_found:
+        try:
+            consumer = KafkaConsumer(*TOPICS, bootstrap_servers=kafka_server)
+            broker_found = True
+
+        except NoBrokersAvailable:
+            pass
+
+        finally:
+            time.sleep(2)
+    return consumer
+
+
 def main(kafka_server):
-    consumer = KafkaConsumer(*TOPICS, bootstrap_servers=kafka_server)
-    db = DeviceDatabase()
+    logger.info("Waiting for kafka server")
+    consumer = wait_consumer(kafka_server)
+    logger.info("Kafka server OK")
+    db = DeviceDatabase(logger)
     rate = 0.1
 
     while True:

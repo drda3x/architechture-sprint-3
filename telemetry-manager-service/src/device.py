@@ -9,12 +9,17 @@ __all__ = [
 ]
 
 class Device:
-    def __init__(self, device_id):
+    def __init__(self, device_id, logger):
         self.__id = device_id
+        self.__logger = logger
 
     @property
     def id(self):
         return self.__id
+
+    @property
+    def logger(self):
+        return self.__logger
 
     def get_data(self):
         pass
