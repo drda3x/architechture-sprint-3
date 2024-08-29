@@ -1,6 +1,6 @@
 from python
 
-run pip install kafka-python-ng flask flask-json
+run pip install kafka-python-ng flask flask-json requests
 copy ./src /app
 workdir /app
 

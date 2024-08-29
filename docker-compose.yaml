@@ -40,13 +40,13 @@ services:
     networks:
       - smart-home-network
 
-  java-monolith:
-    image: ghcr.io/drda3x/java-monolith
-    build: ./smart-home-monolith
-    container_name: java-monolith 
-    restart: unless-stopped
-    networks:
-      - smart-home-network
+# java-monolith:
+#   image: ghcr.io/drda3x/java-monolith
+#   build: ./smart-home-monolith
+#   container_name: java-monolith 
+#   restart: unless-stopped
+#   networks:
+#     - smart-home-network
 
 #  zookeeper:
 #    image: "zookeeper"
