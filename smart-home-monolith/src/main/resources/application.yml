@@ -1,7 +1,7 @@
 spring:
   datasource:
 #   url: jdbc:postgresql://172.17.0.1:5432/smart_home
-    url: jdbc:postgresql://postgres:5432/smart_home
+    url: jdbc:postgresql://${DATABASE_URL}:${DATABASE_PORT}/smart_home
     username: your_username
     password: your_password
     hikari:

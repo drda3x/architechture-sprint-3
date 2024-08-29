@@ -94,6 +94,10 @@ volumeMounts: []
 #   mountPath: "/etc/foo"
 #   readOnly: true
 
+env:
+  database_url: smart-home-monilith-postgresql
+  database_port: 5432
+
 nodeSelector: {}
 
 tolerations: []

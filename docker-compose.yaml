@@ -47,6 +47,9 @@ services:
     restart: unless-stopped
     networks:
       - smart-home-network
+    environment:
+      DATABASE_URL: postgres
+      DATABASE_PORT: 5432
 
   kafka:
     image: "apache/kafka"
